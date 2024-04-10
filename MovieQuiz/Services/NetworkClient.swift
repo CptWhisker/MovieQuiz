@@ -6,6 +6,19 @@ enum NetworkError: Error {
     case imageError
 }
 
+extension NetworkError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .codeError:
+            return NSLocalizedString("Server returned an invalid HTTP status code", comment: "Invalid response error")
+        case .clientError:
+            return NSLocalizedString("Server returned an empty list of movies", comment: "Invalid data error")
+        case .imageError:
+            return NSLocalizedString("Unable to load image", comment: "Image loading error")
+        }
+    }
+}
+
 struct NetworkClient {
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
         let request = URLRequest(url: url)
