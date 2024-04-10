@@ -1,6 +1,5 @@
 import Foundation
 
-
 final class QuestionFactory: QuestionFactoryProtocol {
     private var movies: [MostPopularMovie] = []
     private let moviesLoader: MoviesLoading
@@ -37,14 +36,18 @@ final class QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                    print("Failed to load image")
+                DispatchQueue.main.async {
+                    self.delegate?.didFailToLoadData(with: NetworkError.imageError)
+                    return
+                }
             }
             
             let rating = Float(movie.rating) ?? 0
-            let compareFactor = Float.random(in: -0.5...0.5)
-            let comparedRating = rating + compareFactor
-            let text = "Рейтинг этого фильма больше чем \(String(format: "%.1f", comparedRating))?"
-            let correctAnswer = rating > comparedRating
+            let comparedRating = rating.generateNumberForComparison()
+            
+            let questionLogic = generateQuestionLogic(rating: rating, comparedRating: comparedRating)
+            let text = questionLogic.0
+            let correctAnswer = questionLogic.1
             
             let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
             
@@ -52,6 +55,15 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 guard let self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
             }
+        }
+    }
+    
+    private func generateQuestionLogic(rating: Float, comparedRating: Float) -> (String, Bool) {
+        let random = Int.random(in: 0...1)
+        if random > 0 {
+            return ("Рейтинг этого фильма больше чем \(String(format: "%.1f", comparedRating))?", rating > comparedRating)
+        } else {
+            return ("Рейтинг этого фильма меньше чем \(String(format: "%.1f", comparedRating))?", rating < comparedRating)
         }
     }
 }
