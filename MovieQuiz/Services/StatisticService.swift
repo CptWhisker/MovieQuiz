@@ -1,6 +1,5 @@
 import Foundation
 
-
 protocol StatisticServiceProtocol {
     var totalAccuracy: Double { get }
     var gamesCount: Int { get }
