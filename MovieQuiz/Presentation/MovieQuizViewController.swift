@@ -11,7 +11,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var correctAnswers = 0
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestion: QuizQuestion?
     private var alertPresenter: AlertPresenter?
     private var statisticService: StatisticServiceProtocol?
     private let presenter = MovieQuizPresenter()
@@ -34,11 +33,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - QuestionFactoryDelegate
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question else { return }
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        hideLoadingIndicator()
-        show(quiz: viewModel)
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func didLoadDataFromServer() {
@@ -54,18 +49,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Actions
     
     @IBAction private func NoButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
         presenter.noButtonClicked()
     }
     
     @IBAction private func YesButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
     
     // MARK: - Private functions
     
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         imageView.layer.borderWidth = 0
         textLabel.text = step.text
@@ -116,11 +109,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         noButton.isEnabled.toggle()
     }
     
-    private func showLoadingIndicator() {
+    func showLoadingIndicator() {
         activityIndicator.startAnimating()
     }
     
-    private func hideLoadingIndicator() {
+    func hideLoadingIndicator() {
         activityIndicator.stopAnimating()
     }
     
