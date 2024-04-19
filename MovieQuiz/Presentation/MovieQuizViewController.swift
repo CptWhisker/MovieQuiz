@@ -1,6 +1,15 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+protocol MovieQuizViewControllerProtocol: AnyObject {
+    func show(quiz step: QuizStepViewModel)
+    func showNetworkError(message: String)
+    func highlightImageBorder(isCorrectAnswer: Bool)
+    func switchButtonsState()
+    func showLoadingIndicator()
+    func hideLoadingIndicator()
+}
+
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
@@ -16,6 +25,7 @@ final class MovieQuizViewController: UIViewController {
         super.viewDidLoad()
         
         presenter = MovieQuizPresenter(viewController: self)
+        presenter.alertPresenter = AlertPresenter(delegate: self)
         
         activityIndicator.hidesWhenStopped = true
     }
