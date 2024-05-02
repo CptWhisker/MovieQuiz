@@ -10,6 +10,7 @@ protocol StatisticServiceProtocol {
 
 final class StatisticServiceImplementation: StatisticServiceProtocol {
     private let userDefaults = UserDefaults.standard
+    
     var totalAccuracy: Double {
         get {
             let correct = userDefaults.double(forKey: Keys.correct.rawValue)
@@ -17,7 +18,6 @@ final class StatisticServiceImplementation: StatisticServiceProtocol {
             return (correct / total) * 100
         }
     }
-    
     var gamesCount: Int {
         get {
             return userDefaults.integer(forKey: Keys.gamesCount.rawValue)
@@ -27,12 +27,10 @@ final class StatisticServiceImplementation: StatisticServiceProtocol {
             userDefaults.setValue(newValue, forKey: Keys.gamesCount.rawValue)
         }
     }
-    
     var bestGame: GameRecord {
         get {
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),
                   let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
-                print("Невозможно сохранить результат")
                 return .init(correct: 0, total: 0, date: Date())
             }
             return record
@@ -40,7 +38,6 @@ final class StatisticServiceImplementation: StatisticServiceProtocol {
         
         set {
             guard let data = try? JSONEncoder().encode(newValue) else {
-                print("Невозможно сохранить результат")
                 return
             }
             userDefaults.set(data, forKey: Keys.bestGame.rawValue)
